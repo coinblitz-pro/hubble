@@ -1,0 +1,32 @@
+#!/bin/bash
+
+ubuntu_version=$(lsb_release -rs | cut -d. -f1)
+if [[ $ubuntu_version -lt 22 ]]; then
+  echo "This script is only for Ubuntu 22 and above"
+  exit 1
+fi
+
+SWAP_SIZE_RAW=$(free -g | grep -oP '\d+' | head -n 1)
+SWAP_SIZE=$((SWAP_SIZE_RAW + 1))
+read -r -e -p "Swap size: " -i "${SWAP_SIZE}g" SWAP_SIZE
+sudo fallocate -l "${SWAP_SIZE}" /swapfile
+sudo chmod 600 /swapfile
+sudo mkswap /swapfile
+sudo swapon /swapfile
+
+echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
+sysctl vm.swappiness=5
+echo 'vm.swappiness=5' | sudo tee -a /etc/sysctl.conf
+
+sysctl vm.vfs_cache_pressure=50
+echo 'vm.vfs_cache_pressure=50' | sudo tee -a /etc/sysctl.conf
+
+if ! command -v docker >/dev/null 2>&1; then
+  sleep 2
+  curl https://get.docker.com | sh
+  if [[ $USER != "root" ]]; then
+    sudo usermod -aG docker "$USER"
+    echo "⚠️ You need logging out and back in again"
+    exit 1
+  fi
+fi
