@@ -1,8 +1,7 @@
 services:
   hubble:
     image: farcasterxyz/hubble:latest
-    pull_policy: always
-    restart: always
+    restart: unless-stopped
     command: ["npx", "pm2-runtime", "start", "pm2.config.cjs"]
     healthcheck:
       test: ["CMD", "curl", "-f", "http://127.0.0.1:2281/v1/info"]
