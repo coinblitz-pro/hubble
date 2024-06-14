@@ -163,8 +163,7 @@ app
     // it's less than 15GB.
     const totalMemory = Math.floor(os.totalmem() / 1024 / 1024 / 1024);
     if (totalMemory < 15) {
-      startupCheck.printStartupCheckStatus(StartupCheckStatus.ERROR, `Hubble requires at least 16GB of RAM to run. Detected ${totalMemory}GB`);
-      // process.exit(1);
+      startupCheck.printStartupCheckStatus(StartupCheckStatus.OK, `Detected ${totalMemory}GB of RAM, recommended 16GB`);
     } else {
       startupCheck.printStartupCheckStatus(StartupCheckStatus.OK, `Detected ${totalMemory}GB of RAM`);
     }
